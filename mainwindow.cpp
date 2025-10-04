@@ -9,6 +9,7 @@
 #include <QApplication>
 #include <QRegularExpression>
 #include <QString>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -21,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
         return;
     }
 
-    loadDataAndDisplay(":/data/data.csv"); // Загрузим данные при старте
+    loadDataAndDisplay(":/data/broke_data.csv"); // Загрузим данные при старте
 }
 
 bool MainWindow::verifyPin()
@@ -59,6 +60,7 @@ bool MainWindow::verifyPin()
     }
 }
 
+
 void MainWindow::loadDataAndDisplay(const QString &fileName)
 {
     QFile file(fileName);
@@ -69,20 +71,59 @@ void MainWindow::loadDataAndDisplay(const QString &fileName)
 
     QTextStream in(&file);
     textEditData->clear();
-
-    // Заголовок
     textEditData->append("Card Number,Route,Time (time_t),Hash");
 
     QString line;
+    QString previousHash = ""; // Начальный хеш для первой записи
+    bool integrityCheckFailed = false; // Флаг нарушения целостности
+
     while (!in.atEnd()) {
         line = in.readLine().trimmed();
-        if (!line.isEmpty()) {
-            textEditData->append(line);
+        if (line.isEmpty()) continue;
+
+        QStringList fields = line.split(',', Qt::SkipEmptyParts);
+        if (fields.size() != 4) {
+            textEditData->append("<span style=\"color:red;\">Ошибка: неверный формат -> " + line + "</span>");
+            integrityCheckFailed = true;
+            continue;
         }
+
+        QString cardNumber = fields[0];
+        QString route = fields[1];
+        QString timeStr = fields[2];
+        QString hashFromFile = fields[3];
+
+        // Проверка целостности
+        QString dataToHash = cardNumber + route + timeStr + previousHash;
+        QByteArray dataBytes = dataToHash.toUtf8();
+        QByteArray calculatedHashBytes = QCryptographicHash::hash(dataBytes, QCryptographicHash::Md5);
+        QString calculatedHashHex = calculatedHashBytes.toHex();
+
+        if (calculatedHashHex != hashFromFile.toLower()) {
+            integrityCheckFailed = true;
+            previousHash = hashFromFile.toLower();
+            textEditData->append("<span style=\"background-color:red; color:white;\">" + line + " *** ОШИБКА ***</span>");
+        } else {
+            if (integrityCheckFailed) {
+                textEditData->append("<span style=\"background-color:red; color:white;\">" + line + " *** ПОСЛЕДОВАТЕЛЬНАЯ ОШИБКА ***</span>");
+                // previousHash остаётся от битой записи
+            } else {
+                textEditData->append(line);
+                // Обновляем previousHash только если цепочка цела
+                previousHash = calculatedHashHex;
+            }
+        }
+
     }
+
+    if (integrityCheckFailed) {
+        textEditData->append("<br><span style=\"color:red;\"><b>*** Ошибка целостности! ***</b></span>");
+    } else {
+        textEditData->append("<br><span style=\"color:green;\"><b>*** Проерка целостности пройдена! ***</b></span>");
+    }
+
     file.close();
 }
-
 MainWindow::~MainWindow()
 {
     delete ui;

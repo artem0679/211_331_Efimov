@@ -22,7 +22,7 @@ private:
     QTextEdit *textEditData;
 
     void loadDataAndDisplay(const QString &fileName);
-
+    void loadDataAndDisplayFromData(const QByteArray &data);
     bool verifyPin();
 };
 #endif // MAINWINDOW_H
