@@ -9,6 +9,7 @@
 #include <QApplication>
 #include <QRegularExpression>
 #include <QString>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -128,3 +129,19 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_pushButtonOpen_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+        this,
+        tr("Open CSV File"),
+        ":/data", // Начальная директория
+        tr("CSV Files (*.csv);;All Files (*)") // фильтр файлов
+        );
+
+    if (!fileName.isEmpty()) {
+        // Если файл выбран, загружаем его
+        loadDataAndDisplay(fileName);
+    }
+}
+

@@ -20,6 +20,13 @@
       <item row="0" column="0">
        <widget class="QTextEdit" name="textEditData"/>
       </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="pushButtonOpen">
+        <property name="text">
+         <string>Открыть файл</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>
