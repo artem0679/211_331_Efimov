@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    textEditData = ui->textEditData; // <-- Добавить это
+    textEditData = ui->textEditData;
     if (!textEditData) {
         QMessageBox::critical(this, "Error", "Could not find textEditData in UI file.");
         return;
