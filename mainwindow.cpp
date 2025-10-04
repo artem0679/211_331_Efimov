@@ -29,7 +29,7 @@ bool MainWindow::verifyPin()
     QString storedPinHash;
     QFile hashFile(":/data/pin_hash.txt");
     if (!hashFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::critical(this, "Ошибка", "Не удалось открыть файл с хешем ПИН-кода (:/pin_hash.txt).");
+        QMessageBox::critical(this, "Ошибка", "Не удалось открыть файл с хешем ПИН-кода");
         return false;
     }
     QTextStream in(&hashFile);
