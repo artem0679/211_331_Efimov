@@ -11,12 +11,15 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp
+    pindialog.cpp
 
 HEADERS += \
     mainwindow.h
+    pindialog.h
 
 FORMS += \
     mainwindow.ui
+    pindialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
